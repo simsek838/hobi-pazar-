@@ -24,6 +24,8 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    html { scroll-behavior: smooth; } /* Sayfa içi kayma efekti için */
+
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--cream);
@@ -402,7 +404,7 @@
       gap: 10px;
     }
 
-    /* ─── MODAL (YENİLENDİ) ─── */
+    /* ─── MODAL ─── */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -441,7 +443,7 @@
     .modal-sub { color: var(--gray); font-size: 0.9rem; margin-bottom: 28px; }
     .form-group { margin-bottom: 18px; text-align: left; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
-    .form-group input {
+    .form-group input, .form-group select {
       width: 100%;
       padding: 11px 14px;
       border: 1.5px solid #e5d8c8;
@@ -451,7 +453,7 @@
       outline: none;
       transition: border 0.2s;
     }
-    .form-group input:focus { border-color: var(--amber); }
+    .form-group input:focus, .form-group select:focus { border-color: var(--amber); }
     .modal-btn {
       width: 100%;
       padding: 13px;
@@ -505,8 +507,8 @@
   <p>Koleksiyon, el yapımı, vintage ve hobi ürünleri arasında keşfet. Kendi ürettiğini sat, başkasının emek verdiğini sahiplen.</p>
 
   <div class="hero-actions">
-    <button class="btn-big amber" onclick="openModal('register')">🛍️ Alışverişe Başla</button>
-    <button class="btn-big ghost" onclick="openModal('register')">📦 İlan Ver</button>
+    <a href="#ilanlar-bolumu" class="btn-big amber" style="text-decoration:none; display:inline-block; line-height:1.2;">🛍️ Alışverişe Başla</a>
+    <button class="btn-big ghost" onclick="openModal('add-product')">📦 İlan Ver</button>
   </div>
 
   <div class="hero-stats">
@@ -534,12 +536,12 @@
   </div>
 </div>
 
-<div class="section" style="padding-top:0">
+<div class="section" id="ilanlar-bolumu" style="padding-top:0">
   <div class="section-header">
     <h2 class="section-title">Son Eklenen İlanlar</h2>
     <a href="#" class="see-all">Tümünü gör →</a>
   </div>
-  <div class="products-grid">
+  <div class="products-grid" id="main-products-grid">
 
     <div class="product-card">
       <img src="https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=500&q=80" class="product-img" alt="Yün Bere" />
@@ -689,7 +691,7 @@
 <section class="cta-banner">
   <h2>Hobini Gelire Dönüştür 🎉</h2>
   <p>Ücretsiz ilan ver, kendi fiyatını belirle, Türkiye'ye sat.</p>
-  <button class="btn btn-big btn-dark" onclick="openModal('register')">Hemen Başla — Ücretsiz</button>
+  <button class="btn btn-big btn-dark" onclick="openModal('add-product')">Hemen Başla — Ücretsiz</button>
 </section>
 
 <footer>
@@ -738,7 +740,7 @@
       </div>
       <div class="form-group">
         <label>Şifre</label>
-        <input type="password" placeholder="••••••••" required />
+        <input type="password" id="login-password" placeholder="En az 6 karakter giriniz" minlength="6" required />
       </div>
       <button type="submit" class="modal-btn">Giriş Yap</button>
     </form>
@@ -770,13 +772,49 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="modal-add-product" onclick="closeModalOutside(event, 'add-product')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-product')">✕</button>
+    <h2>Yeni İlan Ekle 📦</h2>
+    <p class="modal-sub">Hobi ürününü alıcılarla buluştur</p>
+    <form id="form-add-product">
+      <div class="form-group">
+        <label>Ürün Başlığı</label>
+        <input type="text" id="prod-title" placeholder="Örn: El Yapımı Seramik Kupa" required />
+      </div>
+      <div class="form-group">
+        <label>Kategori</label>
+        <select id="prod-category">
+          <option value="🧶 Örgü & Dikiş">🧶 Örgü & Dikiş</option>
+          <option value="🎨 Resim & Sanat">🎨 Resim & Sanat</option>
+          <option value="📚 Koleksiyon">📚 Koleksiyon</option>
+          <option value="🪵 Ahşap İşleri">🪵 Ahşap İşleri</option>
+          <option value="💍 Takı & Aksesuar">💍 Takı & Aksesuar</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Fiyat (TL)</label>
+        <input type="number" id="prod-price" placeholder="Örn: 350" required />
+      </div>
+      <div class="form-group">
+        <label>Kullanıcı Adınız</label>
+        <input type="text" id="prod-seller" placeholder="Örn: hobi_sever" required />
+      </div>
+      <div class="form-group">
+        <label>Şehir</label>
+        <input type="text" id="prod-location" placeholder="Örn: Yalova" required />
+      </div>
+      <button type="submit" class="modal-btn">İlanı Yayınla 🎉</button>
+    </form>
+  </div>
+</div>
+
 <script>
   // Modal Açma Kapama Fonksiyonları
   function openModal(id) {
     const modal = document.getElementById('modal-' + id);
     if(modal) {
       modal.style.display = 'flex';
-      // CSS geçiş efekti için tarayıcının render etmesini bekliyoruz
       setTimeout(() => modal.classList.add('active'), 10);
       document.body.style.overflow = 'hidden';
     }
@@ -786,7 +824,6 @@
     const modal = document.getElementById('modal-' + id);
     if(modal) {
       modal.classList.remove('active');
-      // Efekt bitince görünmez yapıyoruz
       setTimeout(() => modal.style.display = 'none', 200);
       document.body.style.overflow = '';
     }
@@ -801,23 +838,87 @@
 
   function switchModal(from, to) {
     closeModal(from);
-    // Eski modal kapandıktan hemen sonra yenisini açıyoruz
     setTimeout(() => openModal(to), 250);
   }
 
-  // Form Gönderim İşlemleri
+  // Form Gönderim İşlemleri (Giriş Yapma Şifre Şartı Dinamikleştirildi)
   document.getElementById('form-login').addEventListener('submit', function(e) {
     e.preventDefault();
-    alert('Başarıyla giriş yapıldı! Mağazaya yönlendiriliyorsunuz.');
-    closeModal('login');
-    this.reset(); // Formu temizle
+    const passInput = document.getElementById('login-password').value;
+    
+    if (passInput.trim().length < 6) {
+      alert('Hata: Şifreniz çok kısa! Güvenliğiniz için en az 6 karakter girmeniz zorunludur.');
+    } else {
+      alert('Başarıyla giriş yapıldı! Mağazaya yönlendiriliyorsunuz.');
+      closeModal('login');
+      this.reset();
+    }
   });
 
   document.getElementById('form-register').addEventListener('submit', function(e) {
     e.preventDefault();
     alert('Kayıt işleminiz başarıyla tamamlandı! Hobi Pazarı dünyasına hoş geldiniz.');
     closeModal('register');
-    this.reset(); // Formu temizle
+    this.reset();
+  });
+
+  // ÇALIŞAN İLAN EKLEME FONKSİYONU
+  document.getElementById('form-add-product').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Değerleri formdan alıyoruz
+    const title = document.getElementById('prod-title').value;
+    const price = document.getElementById('prod-price').value;
+    const seller = document.getElementById('prod-seller').value;
+    const location = document.getElementById('prod-location').value;
+    
+    // Rastgele bir hazır sanatsal görsel linki atıyoruz
+    const randomImages = [
+      "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=500&q=80",
+      "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?auto=format&fit=crop&w=500&q=80",
+      "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=500&q=80"
+    ];
+    const chosenImg = randomImages[Math.floor(Math.random() * randomImages.length)];
+
+    // Yeni ilan kartı şablonunu oluşturuyoruz
+    const newCard = document.createElement('div');
+    newCard.className = 'product-card';
+    newCard.innerHTML = `
+      <img src="${chosenImg}" class="product-img" alt="${title}" />
+      <span class="badge-new" style="background:var(--amber);">Sizin İlanınız</span>
+      <button class="fav-btn">🤍</button>
+      <div class="product-info">
+        <div>
+          <div class="product-title">${title}</div>
+          <div class="product-meta">
+            <div class="product-price">₺${price}</div>
+            <div class="product-seller">Satıcı: <span>${seller}</span></div>
+          </div>
+        </div>
+        <a href="https://wa.me/905000000000?text=Merhaba%20${seller},%20${encodeURIComponent(title)}%20ilanınızla%20ilgileniyorum." target="_blank" class="btn-whatsapp">💬 Satıcıya Mesaj Gönder</a>
+      </div>
+      <div class="product-footer">
+        <span class="product-location">${location}</span>
+        <span class="product-date">Şimdi eklendi</span>
+      </div>
+    `;
+
+    // Yeni kartı ilan listesinin en tepesine ekliyoruz
+    const grid = document.getElementById('main-products-grid');
+    grid.insertBefore(newCard, grid.firstChild);
+
+    // Yeni eklenen kartın içindeki kalp butonuna da tıklama özelliği veriyoruz
+    newCard.querySelector('.fav-btn').addEventListener('click', function(evt) {
+      evt.stopPropagation();
+      this.textContent = this.textContent === '🤍' ? '❤️' : '🤍';
+    });
+
+    alert('Harika! İlanınız başarıyla oluşturuldu ve "Son Eklenen İlanlar" listesine eklendi.');
+    closeModal('add-product');
+    this.reset();
+    
+    // Eklenen ilanı görmesi için listeye kaydırıyoruz
+    document.getElementById('ilanlar-bolumu').scrollIntoView();
   });
 
   // Favori Butonu Değişimi
@@ -845,8 +946,7 @@
   // Klavye ESC tuşu ile kapatma dinleyicisi
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-      closeModal('login');
-      closeModal('register');
+      ['login','register','add-product'].forEach(closeModal);
     }
   });
 </script>
