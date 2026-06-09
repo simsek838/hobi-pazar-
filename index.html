@@ -23,8 +23,7 @@
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; } /* Sayfa içi kayma efekti için */
+    html { scroll-behavior: smooth; }
 
     body {
       font-family: 'DM Sans', sans-serif;
@@ -93,6 +92,8 @@
     .search-bar button:hover { background: var(--amber-dark); }
 
     .nav-btns { display: flex; gap: 10px; align-items: center; }
+    .user-badge { color: var(--amber); font-weight: 600; font-size: 0.95rem; background: rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 8px; display: none; }
+    
     .btn {
       padding: 9px 20px;
       border-radius: 9px;
@@ -158,6 +159,7 @@
       line-height: 1.6;
     }
     .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    
     .btn-big {
       padding: 14px 32px;
       font-size: 1rem;
@@ -167,6 +169,10 @@
       border: none;
       font-family: 'DM Sans', sans-serif;
       transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
     .btn-big.amber { background: var(--amber); color: var(--brown); }
     .btn-big.amber:hover { background: var(--amber-dark); transform: translateY(-2px); }
@@ -234,8 +240,6 @@
       transition: all 0.25s;
       cursor: pointer;
       position: relative;
-      display: flex;
-      flex-direction: column;
     }
     .product-card:hover { transform: translateY(-5px); box-shadow: 0 12px 36px rgba(61,43,31,0.15); }
 
@@ -244,6 +248,10 @@
       aspect-ratio: 1;
       object-fit: cover;
       background: var(--warm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
     }
     .badge-new, .badge-sold {
       position: absolute;
@@ -255,7 +263,6 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      z-index: 5;
     }
     .badge-new { background: var(--green); color: #fff; }
     .badge-sold { background: var(--red); color: #fff; }
@@ -275,32 +282,15 @@
       align-items: center;
       justify-content: center;
       transition: all 0.2s;
-      z-index: 5;
     }
     .fav-btn:hover { transform: scale(1.15); }
 
-    .product-info { padding: 16px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-    .product-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 12px; line-height: 1.35; min-height: 40px; }
-    .product-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .product-info { padding: 16px; }
+    .product-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; line-height: 1.35; }
+    .product-meta { display: flex; align-items: center; justify-content: space-between; }
     .product-price { font-size: 1.2rem; font-weight: 700; color: var(--amber-dark); }
     .product-seller { font-size: 0.78rem; color: var(--gray); }
     .product-seller span { color: var(--green); font-weight: 600; }
-    
-    .btn-whatsapp {
-      display: block;
-      text-align: center;
-      background: #25d366;
-      color: #fff;
-      font-size: 0.85rem;
-      font-weight: bold;
-      padding: 10px;
-      border-radius: 8px;
-      text-decoration: none;
-      margin-top: 5px;
-      transition: background 0.2s;
-    }
-    .btn-whatsapp:hover { background: #20ba5a; }
-
     .product-footer {
       display: flex;
       align-items: center;
@@ -409,15 +399,13 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.55);
       z-index: 200;
       align-items: center;
       justify-content: center;
       padding: 20px;
-      opacity: 0;
-      transition: opacity 0.2s ease;
     }
-    .modal-overlay.active { display: flex; opacity: 1; }
+    .modal-overlay.active { display: flex; }
     .modal {
       background: var(--white);
       border-radius: 20px;
@@ -425,11 +413,14 @@
       width: 100%;
       max-width: 420px;
       position: relative;
-      transform: translateY(20px);
-      transition: transform 0.2s ease;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      animation: slideUp 0.25s ease;
+      max-height: 90vh;
+      overflow-y: auto;
     }
-    .modal-overlay.active .modal { transform: translateY(0); }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
     .modal-close {
       position: absolute; top: 16px; right: 16px;
       background: none; border: none; font-size: 1.4rem;
@@ -441,9 +432,9 @@
       margin-bottom: 6px;
     }
     .modal-sub { color: var(--gray); font-size: 0.9rem; margin-bottom: 28px; }
-    .form-group { margin-bottom: 18px; text-align: left; }
+    .form-group { margin-bottom: 18px; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
-    .form-group input, .form-group select {
+    .form-group input, .form-group textarea, .form-group select {
       width: 100%;
       padding: 11px 14px;
       border: 1.5px solid #e5d8c8;
@@ -453,7 +444,7 @@
       outline: none;
       transition: border 0.2s;
     }
-    .form-group input:focus, .form-group select:focus { border-color: var(--amber); }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--amber); }
     .modal-btn {
       width: 100%;
       padding: 13px;
@@ -471,484 +462,5 @@
     .modal-btn:hover { background: var(--amber-dark); }
     .modal-switch { text-align: center; margin-top: 18px; font-size: 0.88rem; color: var(--gray); }
     .modal-switch a { color: var(--amber-dark); cursor: pointer; font-weight: 600; text-decoration: underline; }
-
-    @media (max-width: 768px) {
-      .footer-inner { grid-template-columns: 1fr 1fr; }
-      .hero-stats { gap: 24px; }
-      .nav-btns .btn:first-child { display: none; }
-    }
-    @media (max-width: 480px) {
-      .footer-inner { grid-template-columns: 1fr; }
-      .logo { font-size: 1.3rem; }
-    }
-  </style>
-</head>
-<body>
-
-<header>
-  <div class="header-inner">
-    <a href="#" class="logo">Hobi<span>Pazarı</span></a>
-
-    <div class="search-bar">
-      <input type="text" placeholder="Ürün, hobi veya satıcı ara…" />
-      <button>🔍</button>
-    </div>
-
-    <nav class="nav-btns">
-      <button class="btn btn-outline" onclick="openModal('login')">Giriş Yap</button>
-      <button class="btn btn-amber" onclick="openModal('register')">Üye Ol</button>
-    </nav>
-  </div>
-</header>
-
-<section class="hero">
-  <div class="hero-badge">🎨 Türkiye'nin Hobi Pazaryeri</div>
-  <h1>El Emeği Ürünleri<br/><em>Al, Sat, Paylaş</em></h1>
-  <p>Koleksiyon, el yapımı, vintage ve hobi ürünleri arasında keşfet. Kendi ürettiğini sat, başkasının emek verdiğini sahiplen.</p>
-
-  <div class="hero-actions">
-    <a href="#ilanlar-bolumu" class="btn-big amber" style="text-decoration:none; display:inline-block; line-height:1.2;">🛍️ Alışverişe Başla</a>
-    <button class="btn-big ghost" onclick="openModal('add-product')">📦 İlan Ver</button>
-  </div>
-
-  <div class="hero-stats">
-    <div class="stat"><div class="stat-num">12.400+</div><div class="stat-lbl">Aktif İlan</div></div>
-    <div class="stat"><div class="stat-num">3.800+</div><div class="stat-lbl">Satıcı</div></div>
-    <div class="stat"><div class="stat-num">48</div><div class="stat-lbl">Kategori</div></div>
-    <div class="stat"><div class="stat-num">%98</div><div class="stat-lbl">Memnuniyet</div></div>
-  </div>
-</section>
-
-<div class="section">
-  <div class="section-header">
-    <h2 class="section-title">Kategoriler</h2>
-    <a href="#" class="see-all">Tümünü gör →</a>
-  </div>
-  <div class="categories">
-    <div class="cat-card"><div class="cat-icon">🧶</div><div class="cat-name">Örgü & Dikiş</div><div class="cat-count">1.240 ilan</div></div>
-    <div class="cat-card"><div class="cat-icon">🎨</div><div class="cat-name">Resim & Sanat</div><div class="cat-count">876 ilan</div></div>
-    <div class="cat-card"><div class="cat-icon">📚</div><div class="cat-name">Koleksiyon</div><div class="cat-count">2.100 ilan</div></div>
-    <div class="cat-card"><div class="cat-icon">🪵</div><div class="cat-name">Ahşap İşleri</div><div class="cat-count">543 ilan</div></div>
-    <div class="cat-card"><div class="cat-icon">💍</div><div class="cat-name">Takı & Aksesuar</div><div class="cat-count">1.890 ilan</div></div>
-    <div class="cat-card"><div class="cat-icon">🎭</div><div class="cat-name">Figür & Maket</div><div class="cat-count">412 ilan</div></div>
-    <div class="cat-card"><div class="cat-icon">🌿</div><div class="cat-name">Doğal & Organik</div><div class="cat-count">320 ilan</div></div>
-    <div class="cat-card"><div class="cat-icon">📷</div><div class="cat-name">Fotoğrafçılık</div><div class="cat-count">265 ilan</div></div>
-  </div>
-</div>
-
-<div class="section" id="ilanlar-bolumu" style="padding-top:0">
-  <div class="section-header">
-    <h2 class="section-title">Son Eklenen İlanlar</h2>
-    <a href="#" class="see-all">Tümünü gör →</a>
-  </div>
-  <div class="products-grid" id="main-products-grid">
-
-    <div class="product-card">
-      <img src="https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=500&q=80" class="product-img" alt="Yün Bere" />
-      <span class="badge-new">Yeni</span>
-      <button class="fav-btn">🤍</button>
-      <div class="product-info">
-        <div>
-          <div class="product-title">El Örgüsü Yün Bere — Kışlık</div>
-          <div class="product-meta">
-            <div class="product-price">₺180</div>
-            <div class="product-seller">Satıcı: <span>ayşe_hobi</span></div>
-          </div>
-        </div>
-        <a href="https://wa.me/905000000000?text=Merhaba%20ayşe_hobi,%20El%20Örgüsü%20Yün%20Bere%20ilanınızla%20ilgileniyorum." target="_blank" class="btn-whatsapp">💬 Satıcıya Mesaj Gönder</a>
-      </div>
-      <div class="product-footer">
-        <span class="product-location">İstanbul</span>
-        <span class="product-date">2 saat önce</span>
-      </div>
-    </div>
-
-    <div class="product-card">
-      <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80" class="product-img" alt="Akrilik Tablo" />
-      <span class="badge-new">Yeni</span>
-      <button class="fav-btn">🤍</button>
-      <div class="product-info">
-        <div>
-          <div class="product-title">Akrilik Tablo — Soyut Doğa, 40x50cm</div>
-          <div class="product-meta">
-            <div class="product-price">₺650</div>
-            <div class="product-seller">Satıcı: <span>sanatci_mehmet</span></div>
-          </div>
-        </div>
-        <a href="https://wa.me/905000000000?text=Merhaba%20sanatci_mehmet,%20Akrilik%20Tablo%20ilanınızla%20ilgileniyorum." target="_blank" class="btn-whatsapp">💬 Satıcıya Mesaj Gönder</a>
-      </div>
-      <div class="product-footer">
-        <span class="product-location">Ankara</span>
-        <span class="product-date">5 saat önce</span>
-      </div>
-    </div>
-
-    <div class="product-card">
-      <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=500&q=80" class="product-img" alt="Doğal Taş Kolye" />
-      <button class="fav-btn">🤍</button>
-      <div class="product-info">
-        <div>
-          <div class="product-title">Gümüş Kaplama Doğal Taş Kolye</div>
-          <div class="product-meta">
-            <div class="product-price">₺290</div>
-            <div class="product-seller">Satıcı: <span>taki_dunyasi</span></div>
-          </div>
-        </div>
-        <a href="https://wa.me/905000000000?text=Merhaba%20taki_dunyasi,%20Gümüş%20Kaplama%20Doğal%20Taş%20Kolye%20ilanınızla%20ilgileniyorum." target="_blank" class="btn-whatsapp">💬 Satıcıya Mesaj Gönder</a>
-      </div>
-      <div class="product-footer">
-        <span class="product-location">İzmir</span>
-        <span class="product-date">1 gün önce</span>
-      </div>
-    </div>
-
-    <div class="product-card">
-      <img src="https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=500&q=80" class="product-img" alt="Ahşap Çerçeve" />
-      <button class="fav-btn">🤍</button>
-      <div class="product-info">
-        <div>
-          <div class="product-title">El Yapımı Ahşap Çerçeve — Ceviz</div>
-          <div class="product-meta">
-            <div class="product-price">₺420</div>
-            <div class="product-seller">Satıcı: <span>ahsap_atolye</span></div>
-          </div>
-        </div>
-        <a href="https://wa.me/905000000000?text=Merhaba%20ahsap_atolye,%20El%20Yapımı%20Ahşap%20Çerçeve%20ilanınızla%20ilgileniyorum." target="_blank" class="btn-whatsapp">💬 Satıcıya Mesaj Gönder</a>
-      </div>
-      <div class="product-footer">
-        <span class="product-location">Bursa</span>
-        <span class="product-date">1 gün önce</span>
-      </div>
-    </div>
-
-    <div class="product-card">
-      <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=500&q=80" class="product-img" alt="Pul Koleksiyonu" />
-      <span class="badge-sold">Satıldı</span>
-      <button class="fav-btn">🤍</button>
-      <div class="product-info">
-        <div>
-          <div class="product-title">Vintage Pul Koleksiyonu — 500+ Adet</div>
-          <div class="product-meta">
-            <div class="product-price">₺1.200</div>
-            <div class="product-seller">Satıcı: <span>koleksiyoncu42</span></div>
-          </div>
-        </div>
-        <a href="#" onclick="alert('Bu ürün satılmıştır.'); return false;" class="btn-whatsapp" style="background:var(--gray);">❌ Satıldı</a>
-      </div>
-      <div class="product-footer">
-        <span class="product-location">Eskişehir</span>
-        <span class="product-date">2 gün önce</span>
-      </div>
-    </div>
-
-    <div class="product-card">
-      <img src="https://images.unsplash.com/photo-1605264964528-06403b38e602?auto=format&fit=crop&w=500&q=80" class="product-img" alt="Doğal Sabun" />
-      <span class="badge-new">Yeni</span>
-      <button class="fav-btn">🤍</button>
-      <div class="product-info">
-        <div>
-          <div class="product-title">El Yapımı Doğal Sabun Seti — 6'lı</div>
-          <div class="product-meta">
-            <div class="product-price">₺245</div>
-            <div class="product-seller">Satıcı: <span>dogal_sabun</span></div>
-          </div>
-        </div>
-        <a href="https://wa.me/905000000000?text=Merhaba%20dogal_sabun,%20El%20Yapımı%20Doğal%20Sabun%20Seti%20ilanınızla%20ilgileniyorum." target="_blank" class="btn-whatsapp">💬 Satıcıya Mesaj Gönder</a>
-      </div>
-      <div class="product-footer">
-        <span class="product-location">Antalya</span>
-        <span class="product-date">3 saat önce</span>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<section class="how-it-works">
-  <div class="how-inner">
-    <h2 class="section-title">Nasıl Çalışır?</h2>
-    <p class="how-subtitle">3 adımda alış ya da satış yap</p>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <h3>Üye Ol</h3>
-        <p>Ücretsiz hesap oluştur, profilini tamamla ve topluluğa katıl.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <h3>İlan Ver / Keşfet</h3>
-        <p>Ürünlerini fotoğraflayıp listele ya da binlerce ilanı incele.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <h3>Anlaş & Teslim Al</h3>
-        <p>Satıcıyla mesajlaş, fiyatı belirle ve güvenle teslim al.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="cta-banner">
-  <h2>Hobini Gelire Dönüştür 🎉</h2>
-  <p>Ücretsiz ilan ver, kendi fiyatını belirle, Türkiye'ye sat.</p>
-  <button class="btn btn-big btn-dark" onclick="openModal('add-product')">Hemen Başla — Ücretsiz</button>
-</section>
-
-<footer>
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <a href="#" class="logo">Hobi<span>Pazarı</span></a>
-      <p>Türkiye'nin en büyük hobi ve el yapımı ürünler pazaryeri. Üreticileri ve meraklıları buluşturuyoruz.</p>
-    </div>
-    <div class="footer-col">
-      <h4>Keşfet</h4>
-      <a href="#">Yeni İlanlar</a>
-      <a href="#">Kategoriler</a>
-      <a href="#">Öne Çıkanlar</a>
-      <a href="#">Satıcılar</a>
-    </div>
-    <div class="footer-col">
-      <h4>Satıcılar</h4>
-      <a href="#">İlan Ver</a>
-      <a href="#">Satıcı Ol</a>
-      <a href="#">Fiyatlandırma</a>
-      <a href="#">Kurallar</a>
-    </div>
-    <div class="footer-col">
-      <h4>Destek</h4>
-      <a href="#">Hakkımızda</a>
-      <a href="#">İletişim</a>
-      <a href="#">SSS</a>
-      <a href="#">Gizlilik</a>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <span>© 2026 HobiPazarı — Tüm hakları saklıdır.</span>
-    <span>🇹🇷 Türkiye'de üretildi</span>
-  </div>
-</footer>
-
-<div class="modal-overlay" id="modal-login" onclick="closeModalOutside(event, 'login')">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('login')">✕</button>
-    <h2>Tekrar Hoş Geldin 👋</h2>
-    <p class="modal-sub">Hesabına giriş yap</p>
-    <form id="form-login">
-      <div class="form-group">
-        <label>E-posta</label>
-        <input type="email" placeholder="ornek@mail.com" required />
-      </div>
-      <div class="form-group">
-        <label>Şifre</label>
-        <input type="password" id="login-password" placeholder="En az 6 karakter giriniz" minlength="6" required />
-      </div>
-      <button type="submit" class="modal-btn">Giriş Yap</button>
-    </form>
-    <p class="modal-switch">Hesabın yok mu? <a onclick="switchModal('login','register')">Üye Ol</a></p>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-register" onclick="closeModalOutside(event, 'register')">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('register')">✕</button>
-    <h2>Üye Ol 🎨</h2>
-    <p class="modal-sub">Ücretsiz hesap oluştur</p>
-    <form id="form-register">
-      <div class="form-group">
-        <label>Ad Soyad</label>
-        <input type="text" placeholder="Adın Soyadın" required />
-      </div>
-      <div class="form-group">
-        <label>E-posta</label>
-        <input type="email" placeholder="ornek@mail.com" required />
-      </div>
-      <div class="form-group">
-        <label>Şifre</label>
-        <input type="password" placeholder="En az 8 karakter" minlength="8" required />
-      </div>
-      <button type="submit" class="modal-btn">Üye Ol — Ücretsiz</button>
-    </form>
-    <p class="modal-switch">Zaten hesabın var mı? <a onclick="switchModal('register','login')">Giriş Yap</a></p>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-add-product" onclick="closeModalOutside(event, 'add-product')">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('add-product')">✕</button>
-    <h2>Yeni İlan Ekle 📦</h2>
-    <p class="modal-sub">Hobi ürününü alıcılarla buluştur</p>
-    <form id="form-add-product">
-      <div class="form-group">
-        <label>Ürün Başlığı</label>
-        <input type="text" id="prod-title" placeholder="Örn: El Yapımı Seramik Kupa" required />
-      </div>
-      <div class="form-group">
-        <label>Kategori</label>
-        <select id="prod-category">
-          <option value="🧶 Örgü & Dikiş">🧶 Örgü & Dikiş</option>
-          <option value="🎨 Resim & Sanat">🎨 Resim & Sanat</option>
-          <option value="📚 Koleksiyon">📚 Koleksiyon</option>
-          <option value="🪵 Ahşap İşleri">🪵 Ahşap İşleri</option>
-          <option value="💍 Takı & Aksesuar">💍 Takı & Aksesuar</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Fiyat (TL)</label>
-        <input type="number" id="prod-price" placeholder="Örn: 350" required />
-      </div>
-      <div class="form-group">
-        <label>Kullanıcı Adınız</label>
-        <input type="text" id="prod-seller" placeholder="Örn: hobi_sever" required />
-      </div>
-      <div class="form-group">
-        <label>Şehir</label>
-        <input type="text" id="prod-location" placeholder="Örn: Yalova" required />
-      </div>
-      <button type="submit" class="modal-btn">İlanı Yayınla 🎉</button>
-    </form>
-  </div>
-</div>
-
-<script>
-  // Modal Açma Kapama Fonksiyonları
-  function openModal(id) {
-    const modal = document.getElementById('modal-' + id);
-    if(modal) {
-      modal.style.display = 'flex';
-      setTimeout(() => modal.classList.add('active'), 10);
-      document.body.style.overflow = 'hidden';
-    }
-  }
-
-  function closeModal(id) {
-    const modal = document.getElementById('modal-' + id);
-    if(modal) {
-      modal.classList.remove('active');
-      setTimeout(() => modal.style.display = 'none', 200);
-      document.body.style.overflow = '';
-    }
-  }
-
-  function closeModalOutside(e, id) {
-    const targetModal = document.getElementById('modal-' + id);
-    if (e.target === targetModal) {
-      closeModal(id);
-    }
-  }
-
-  function switchModal(from, to) {
-    closeModal(from);
-    setTimeout(() => openModal(to), 250);
-  }
-
-  // Form Gönderim İşlemleri (Giriş Yapma Şifre Şartı Dinamikleştirildi)
-  document.getElementById('form-login').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const passInput = document.getElementById('login-password').value;
     
-    if (passInput.trim().length < 6) {
-      alert('Hata: Şifreniz çok kısa! Güvenliğiniz için en az 6 karakter girmeniz zorunludur.');
-    } else {
-      alert('Başarıyla giriş yapıldı! Mağazaya yönlendiriliyorsunuz.');
-      closeModal('login');
-      this.reset();
-    }
-  });
-
-  document.getElementById('form-register').addEventListener('submit', function(e) {
-    e.preventDefault();
-    alert('Kayıt işleminiz başarıyla tamamlandı! Hobi Pazarı dünyasına hoş geldiniz.');
-    closeModal('register');
-    this.reset();
-  });
-
-  // ÇALIŞAN İLAN EKLEME FONKSİYONU
-  document.getElementById('form-add-product').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    // Değerleri formdan alıyoruz
-    const title = document.getElementById('prod-title').value;
-    const price = document.getElementById('prod-price').value;
-    const seller = document.getElementById('prod-seller').value;
-    const location = document.getElementById('prod-location').value;
-    
-    // Rastgele bir hazır sanatsal görsel linki atıyoruz
-    const randomImages = [
-      "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=500&q=80",
-      "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?auto=format&fit=crop&w=500&q=80",
-      "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=500&q=80"
-    ];
-    const chosenImg = randomImages[Math.floor(Math.random() * randomImages.length)];
-
-    // Yeni ilan kartı şablonunu oluşturuyoruz
-    const newCard = document.createElement('div');
-    newCard.className = 'product-card';
-    newCard.innerHTML = `
-      <img src="${chosenImg}" class="product-img" alt="${title}" />
-      <span class="badge-new" style="background:var(--amber);">Sizin İlanınız</span>
-      <button class="fav-btn">🤍</button>
-      <div class="product-info">
-        <div>
-          <div class="product-title">${title}</div>
-          <div class="product-meta">
-            <div class="product-price">₺${price}</div>
-            <div class="product-seller">Satıcı: <span>${seller}</span></div>
-          </div>
-        </div>
-        <a href="https://wa.me/905000000000?text=Merhaba%20${seller},%20${encodeURIComponent(title)}%20ilanınızla%20ilgileniyorum." target="_blank" class="btn-whatsapp">💬 Satıcıya Mesaj Gönder</a>
-      </div>
-      <div class="product-footer">
-        <span class="product-location">${location}</span>
-        <span class="product-date">Şimdi eklendi</span>
-      </div>
-    `;
-
-    // Yeni kartı ilan listesinin en tepesine ekliyoruz
-    const grid = document.getElementById('main-products-grid');
-    grid.insertBefore(newCard, grid.firstChild);
-
-    // Yeni eklenen kartın içindeki kalp butonuna da tıklama özelliği veriyoruz
-    newCard.querySelector('.fav-btn').addEventListener('click', function(evt) {
-      evt.stopPropagation();
-      this.textContent = this.textContent === '🤍' ? '❤️' : '🤍';
-    });
-
-    alert('Harika! İlanınız başarıyla oluşturuldu ve "Son Eklenen İlanlar" listesine eklendi.');
-    closeModal('add-product');
-    this.reset();
-    
-    // Eklenen ilanı görmesi için listeye kaydırıyoruz
-    document.getElementById('ilanlar-bolumu').scrollIntoView();
-  });
-
-  // Favori Butonu Değişimi
-  document.querySelectorAll('.fav-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      btn.textContent = btn.textContent === '🤍' ? '❤️' : '🤍';
-    });
-  });
-
-  // Canlı Arama Fonksiyonu
-  const searchInput = document.querySelector('.search-bar input');
-  searchInput.addEventListener('input', (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    document.querySelectorAll('.product-card').forEach(card => {
-      const title = card.querySelector('.product-title').textContent.toLowerCase();
-      if (title.includes(searchTerm)) {
-        card.style.display = 'flex';
-      } else {
-        card.style.display = 'none';
-      }
-    });
-  });
-
-  // Klavye ESC tuşu ile kapatma dinleyicisi
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      ['login','register','add-product'].forEach(closeModal);
-    }
-  });
-</script>
-</body>
-</html>
+    .alert-danger { display: none; background: #f8d7da; color
