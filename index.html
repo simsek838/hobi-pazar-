@@ -232,6 +232,8 @@
       transition: all 0.25s;
       cursor: pointer;
       position: relative;
+      display: flex;
+      flex-direction: column;
     }
     .product-card:hover { transform: translateY(-5px); box-shadow: 0 12px 36px rgba(61,43,31,0.15); }
 
@@ -240,10 +242,6 @@
       aspect-ratio: 1;
       object-fit: cover;
       background: var(--warm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 4rem;
     }
     .badge-new, .badge-sold {
       position: absolute;
@@ -255,6 +253,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      z-index: 5;
     }
     .badge-new { background: var(--green); color: #fff; }
     .badge-sold { background: var(--red); color: #fff; }
@@ -274,15 +273,32 @@
       align-items: center;
       justify-content: center;
       transition: all 0.2s;
+      z-index: 5;
     }
     .fav-btn:hover { transform: scale(1.15); }
 
-    .product-info { padding: 16px; }
-    .product-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; line-height: 1.35; }
-    .product-meta { display: flex; align-items: center; justify-content: space-between; }
+    .product-info { padding: 16px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .product-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 12px; line-height: 1.35; min-height: 40px; }
+    .product-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .product-price { font-size: 1.2rem; font-weight: 700; color: var(--amber-dark); }
     .product-seller { font-size: 0.78rem; color: var(--gray); }
     .product-seller span { color: var(--green); font-weight: 600; }
+    
+    .btn-whatsapp {
+      display: block;
+      text-align: center;
+      background: #25d366;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      margin-top: 5px;
+      transition: background 0.2s;
+    }
+    .btn-whatsapp:hover { background: #20ba5a; }
+
     .product-footer {
       display: flex;
       align-items: center;
@@ -466,7 +482,6 @@
 </head>
 <body>
 
-<!-- ═══════════════════ HEADER ═══════════════════ -->
 <header>
   <div class="header-inner">
     <a href="#" class="logo">Hobi<span>Pazarı</span></a>
@@ -483,7 +498,6 @@
   </div>
 </header>
 
-<!-- ═══════════════════ HERO ═══════════════════ -->
 <section class="hero">
   <div class="hero-badge">🎨 Türkiye'nin Hobi Pazaryeri</div>
   <h1>El Emeği Ürünleri<br/><em>Al, Sat, Paylaş</em></h1>
@@ -502,7 +516,6 @@
   </div>
 </section>
 
-<!-- ═══════════════════ KATEGORİLER ═══════════════════ -->
 <div class="section">
   <div class="section-header">
     <h2 class="section-title">Kategoriler</h2>
@@ -520,7 +533,6 @@
   </div>
 </div>
 
-<!-- ═══════════════════ SON İLANLAR ═══════════════════ -->
 <div class="section" style="padding-top:0">
   <div class="section-header">
     <h2 class="section-title">Son Eklenen İlanlar</h2>
@@ -529,15 +541,18 @@
   <div class="products-grid">
 
     <div class="product-card">
-      <div class="product-img">🧶</div>
+      <img src="https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=500&q=80" class="product-img" alt="Yün Bere" />
       <span class="badge-new">Yeni</span>
       <button class="fav-btn">🤍</button>
       <div class="product-info">
-        <div class="product-title">El Örgüsü Yün Bere — Kışlık</div>
-        <div class="product-meta">
-          <div class="product-price">₺180</div>
-          <div class="product-seller">Satıcı: <span>ayşe_hobi</span></div>
+        <div>
+          <div class="product-title">El Örgüsü Yün Bere — Kışlık</div>
+          <div class="product-meta">
+            <div class="product-price">₺180</div>
+            <div class="product-seller">Satıcı: <span>ayşe_hobi</span></div>
+          </div>
         </div>
+        <a href="https://wa.me/905000000000?text=Merhaba%20ayşe_hobi,%20El%20Örgüsü%20Yün%20Bere%20ilanınızla%20ilgileniyorum." target="_blank" class="btn-whatsapp">💬 Satıcıya Mesaj Gönder</a>
       </div>
       <div class="product-footer">
         <span class="product-location">İstanbul</span>
@@ -546,15 +561,18 @@
     </div>
 
     <div class="product-card">
-      <div class="product-img">🎨</div>
+      <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80" class="product-img" alt="Akrilik Tablo" />
       <span class="badge-new">Yeni</span>
       <button class="fav-btn">🤍</button>
       <div class="product-info">
-        <div class="product-title">Akrilik Tablo — Soyut Doğa, 40x50cm</div>
-        <div class="product-meta">
-          <div class="product-price">₺650</div>
-          <div class="product-seller">Satıcı: <span>sanatci_mehmet</span></div>
+        <div>
+          <div class="product-title">Akrilik Tablo — Soyut Doğa, 40x50cm</div>
+          <div class="product-meta">
+            <div class="product-price">₺650</div>
+            <div class="product-seller">Satıcı: <span>sanatci_mehmet</span></div>
+          </div>
         </div>
+        <a href="https://wa.me/905000000000?text=Merhaba%20sanatci_mehmet,%20Akrilik%20Tablo%20ilanınızla%20ilgileniyorum." target="_blank" class="btn-whatsapp">💬 Satıcıya Mesaj Gönder</a>
       </div>
       <div class="product-footer">
         <span class="product-location">Ankara</span>
@@ -563,14 +581,17 @@
     </div>
 
     <div class="product-card">
-      <div class="product-img">💍</div>
+      <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=500&q=80" class="product-img" alt="Doğal Taş Kolye" />
       <button class="fav-btn">🤍</button>
       <div class="product-info">
-        <div class="product-title">Gümüş Kaplama Doğal Taş Kolye</div>
-        <div class="product-meta">
-          <div class="product-price">₺290</div>
-          <div class="product-seller">Satıcı: <span>taki_dunyasi</span></div>
+        <div>
+          <div class="product-title">Gümüş Kaplama Doğal Taş Kolye</div>
+          <div class="product-meta">
+            <div class="product-price">₺290</div>
+            <div class="product-seller">Satıcı: <span>taki_dunyasi</span></div>
+          </div>
         </div>
+        <a href="https://wa.me/905000000000?text=Merhaba%20taki_dunyasi,%20Gümüş%20Kaplama%20Doğal%20Taş%20Kolye%20ilanınızla%20ilgileniyorum." target="_blank" class="btn-whatsapp">💬 Satıcıya Mesaj Gönder</a>
       </div>
       <div class="product-footer">
         <span class="product-location">İzmir</span>
@@ -579,14 +600,17 @@
     </div>
 
     <div class="product-card">
-      <div class="product-img">🪵</div>
+      <img src="https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=500&q=80" class="product-img" alt="Ahşap Çerçeve" />
       <button class="fav-btn">🤍</button>
       <div class="product-info">
-        <div class="product-title">El Yapımı Ahşap Çerçeve — Ceviz</div>
-        <div class="product-meta">
-          <div class="product-price">₺420</div>
-          <div class="product-seller">Satıcı: <span>ahsap_atolye</span></div>
+        <div>
+          <div class="product-title">El Yapımı Ahşap Çerçeve — Ceviz</div>
+          <div class="product-meta">
+            <div class="product-price">₺420</div>
+            <div class="product-seller">Satıcı: <span>ahsap_atolye</span></div>
+          </div>
         </div>
+        <a href="https://wa.me/905000000000?text=Merhaba%20ahsap_atolye,%20El%20Yapımı%20Ahşap%20Çerçeve%20ilanınızla%20ilgileniyorum." target="_blank" class="btn-whatsapp">💬 Satıcıya Mesaj Gönder</a>
       </div>
       <div class="product-footer">
         <span class="product-location">Bursa</span>
@@ -595,15 +619,18 @@
     </div>
 
     <div class="product-card">
-      <div class="product-img">📚</div>
+      <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=500&q=80" class="product-img" alt="Pul Koleksiyonu" />
       <span class="badge-sold">Satıldı</span>
       <button class="fav-btn">🤍</button>
       <div class="product-info">
-        <div class="product-title">Vintage Pul Koleksiyonu — 500+ Adet</div>
-        <div class="product-meta">
-          <div class="product-price">₺1.200</div>
-          <div class="product-seller">Satıcı: <span>koleksiyoncu42</span></div>
+        <div>
+          <div class="product-title">Vintage Pul Koleksiyonu — 500+ Adet</div>
+          <div class="product-meta">
+            <div class="product-price">₺1.200</div>
+            <div class="product-seller">Satıcı: <span>koleksiyoncu42</span></div>
+          </div>
         </div>
+        <a href="#" onclick="alert('Bu ürün satılmıştır.'); return false;" class="btn-whatsapp" style="background:var(--gray);">❌ Satıldı</a>
       </div>
       <div class="product-footer">
         <span class="product-location">Eskişehir</span>
@@ -612,15 +639,18 @@
     </div>
 
     <div class="product-card">
-      <div class="product-img">🌿</div>
+      <img src="https://images.unsplash.com/photo-1605264964528-06403b38e602?auto=format&fit=crop&w=500&q=80" class="product-img" alt="Doğal Sabun" />
       <span class="badge-new">Yeni</span>
       <button class="fav-btn">🤍</button>
       <div class="product-info">
-        <div class="product-title">El Yapımı Doğal Sabun Seti — 6'lı</div>
-        <div class="product-meta">
-          <div class="product-price">₺245</div>
-          <div class="product-seller">Satıcı: <span>dogal_sabun</span></div>
+        <div>
+          <div class="product-title">El Yapımı Doğal Sabun Seti — 6'lı</div>
+          <div class="product-meta">
+            <div class="product-price">₺245</div>
+            <div class="product-seller">Satıcı: <span>dogal_sabun</span></div>
+          </div>
         </div>
+        <a href="https://wa.me/905000000000?text=Merhaba%20dogal_sabun,%20El%20Yapımı%20Doğal%20Sabun%20Seti%20ilanınızla%20ilgileniyorum." target="_blank" class="btn-whatsapp">💬 Satıcıya Mesaj Gönder</a>
       </div>
       <div class="product-footer">
         <span class="product-location">Antalya</span>
@@ -631,7 +661,6 @@
   </div>
 </div>
 
-<!-- ═══════════════════ NASIL ÇALIŞIR ═══════════════════ -->
 <section class="how-it-works">
   <div class="how-inner">
     <h2 class="section-title">Nasıl Çalışır?</h2>
@@ -640,7 +669,7 @@
       <div class="step">
         <div class="step-num">1</div>
         <h3>Üye Ol</h3>
-        <p>Ücretsiz hesap oluştur, profilini tamamla ve topluluğa katıl.</p>
+        <p>Ücretsiz hesap oluştur, profilini tamamla dairy topluluğa katıl.</p>
       </div>
       <div class="step">
         <div class="step-num">2</div>
@@ -656,18 +685,16 @@
   </div>
 </section>
 
-<!-- ═══════════════════ CTA BANNER ═══════════════════ -->
 <section class="cta-banner">
   <h2>Hobini Gelire Dönüştür 🎉</h2>
   <p>Ücretsiz ilan ver, kendi fiyatını belirle, Türkiye'ye sat.</p>
   <button class="btn btn-big btn-dark" onclick="openModal('register')">Hemen Başla — Ücretsiz</button>
 </section>
 
-<!-- ═══════════════════ FOOTER ═══════════════════ -->
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
-      <a href="#" class="logo">Hobi<span style="color:var(--cream)">Pazarı</span></a>
+      <a href="#" class="logo">Hobi<span>Pazarı</span></a>
       <p>Türkiye'nin en büyük hobi ve el yapımı ürünler pazaryeri. Üreticileri ve meraklıları buluşturuyoruz.</p>
     </div>
     <div class="footer-col">
@@ -698,50 +725,52 @@
   </div>
 </footer>
 
-<!-- ═══════════════════ GİRİŞ MODALI ═══════════════════ -->
 <div class="modal-overlay" id="modal-login" onclick="closeModalOutside(event, 'login')">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('login')">✕</button>
     <h2>Tekrar Hoş Geldin 👋</h2>
     <p class="modal-sub">Hesabına giriş yap</p>
-    <div class="form-group">
-      <label>E-posta</label>
-      <input type="email" placeholder="ornek@mail.com" />
-    </div>
-    <div class="form-group">
-      <label>Şifre</label>
-      <input type="password" placeholder="••••••••" />
-    </div>
-    <button class="modal-btn">Giriş Yap</button>
+    <form onsubmit="event.preventDefault(); alert('Başarıyla giriş yapıldı!'); closeModal('login');">
+      <div class="form-group">
+        <label>E-posta</label>
+        <input type="email" placeholder="ornek@mail.com" required />
+      </div>
+      <div class="form-group">
+        <label>Şifre</label>
+        <input type="password" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="modal-btn">Giriş Yap</button>
+    </form>
     <p class="modal-switch">Hesabın yok mu? <a onclick="switchModal('login','register')">Üye Ol</a></p>
   </div>
 </div>
 
-<!-- ═══════════════════ KAYIT MODALI ═══════════════════ -->
 <div class="modal-overlay" id="modal-register" onclick="closeModalOutside(event, 'register')">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('register')">✕</button>
     <h2>Üye Ol 🎨</h2>
     <p class="modal-sub">Ücretsiz hesap oluştur</p>
-    <div class="form-group">
-      <label>Ad Soyad</label>
-      <input type="text" placeholder="Adın Soyadın" />
-    </div>
-    <div class="form-group">
-      <label>E-posta</label>
-      <input type="email" placeholder="ornek@mail.com" />
-    </div>
-    <div class="form-group">
-      <label>Şifre</label>
-      <input type="password" placeholder="En az 8 karakter" />
-    </div>
-    <button class="modal-btn">Üye Ol — Ücretsiz</button>
+    <form onsubmit="event.preventDefault(); alert('Kayıt işleminiz başarıyla tamamlandı!'); closeModal('register');">
+      <div class="form-group">
+        <label>Ad Soyad</label>
+        <input type="text" placeholder="Adın Soyadın" required />
+      </div>
+      <div class="form-group">
+        <label>E-posta</label>
+        <input type="email" placeholder="ornek@mail.com" required />
+      </div>
+      <div class="form-group">
+        <label>Şifre</label>
+        <input type="password" placeholder="En az 8 karakter" minlength="8" required />
+      </div>
+      <button type="submit" class="modal-btn">Üye Ol — Ücretsiz</button>
+    </form>
     <p class="modal-switch">Zaten hesabın var mı? <a onclick="switchModal('register','login')">Giriş Yap</a></p>
   </div>
 </div>
 
 <script>
-  // Modal
+  // Modal İşlemleri
   function openModal(id) {
     document.getElementById('modal-' + id).classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -758,7 +787,7 @@
     setTimeout(() => openModal(to), 180);
   }
 
-  // Favori toggle
+  // Favori Butonu Değişimi
   document.querySelectorAll('.fav-btn').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
@@ -766,7 +795,21 @@
     });
   });
 
-  // Klavye ESC
+  // CANLI ARAMA FONSİYONU (Yeni Eklendi)
+  const searchInput = document.querySelector('.search-bar input');
+  searchInput.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    document.querySelectorAll('.product-card').forEach(card => {
+      const title = card.querySelector('.product-title').textContent.toLowerCase();
+      if (title.includes(searchTerm)) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+
+  // Klavye ESC ile Modalları Kapatma
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       ['login','register'].forEach(closeModal);
