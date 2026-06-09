@@ -402,18 +402,20 @@
       gap: 10px;
     }
 
-    /* ─── MODAL ─── */
+    /* ─── MODAL (YENİLENDİ) ─── */
     .modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.55);
+      background: rgba(0,0,0,0.6);
       z-index: 200;
       align-items: center;
       justify-content: center;
       padding: 20px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
     }
-    .modal-overlay.active { display: flex; }
+    .modal-overlay.active { display: flex; opacity: 1; }
     .modal {
       background: var(--white);
       border-radius: 20px;
@@ -421,12 +423,11 @@
       width: 100%;
       max-width: 420px;
       position: relative;
-      animation: slideUp 0.25s ease;
+      transform: translateY(20px);
+      transition: transform 0.2s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    .modal-overlay.active .modal { transform: translateY(0); }
     .modal-close {
       position: absolute; top: 16px; right: 16px;
       background: none; border: none; font-size: 1.4rem;
@@ -438,7 +439,7 @@
       margin-bottom: 6px;
     }
     .modal-sub { color: var(--gray); font-size: 0.9rem; margin-bottom: 28px; }
-    .form-group { margin-bottom: 18px; }
+    .form-group { margin-bottom: 18px; text-align: left; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
     .form-group input {
       width: 100%;
@@ -467,7 +468,7 @@
     }
     .modal-btn:hover { background: var(--amber-dark); }
     .modal-switch { text-align: center; margin-top: 18px; font-size: 0.88rem; color: var(--gray); }
-    .modal-switch a { color: var(--amber-dark); cursor: pointer; font-weight: 600; }
+    .modal-switch a { color: var(--amber-dark); cursor: pointer; font-weight: 600; text-decoration: underline; }
 
     @media (max-width: 768px) {
       .footer-inner { grid-template-columns: 1fr 1fr; }
@@ -669,7 +670,7 @@
       <div class="step">
         <div class="step-num">1</div>
         <h3>Üye Ol</h3>
-        <p>Ücretsiz hesap oluştur, profilini tamamla dairy topluluğa katıl.</p>
+        <p>Ücretsiz hesap oluştur, profilini tamamla ve topluluğa katıl.</p>
       </div>
       <div class="step">
         <div class="step-num">2</div>
@@ -720,7 +721,7 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <span>© 2025 HobiPazarı — Tüm hakları saklıdır.</span>
+    <span>© 2026 HobiPazarı — Tüm hakları saklıdır.</span>
     <span>🇹🇷 Türkiye'de üretildi</span>
   </div>
 </footer>
@@ -730,7 +731,7 @@
     <button class="modal-close" onclick="closeModal('login')">✕</button>
     <h2>Tekrar Hoş Geldin 👋</h2>
     <p class="modal-sub">Hesabına giriş yap</p>
-    <form onsubmit="event.preventDefault(); alert('Başarıyla giriş yapıldı!'); closeModal('login');">
+    <form id="form-login">
       <div class="form-group">
         <label>E-posta</label>
         <input type="email" placeholder="ornek@mail.com" required />
@@ -750,7 +751,7 @@
     <button class="modal-close" onclick="closeModal('register')">✕</button>
     <h2>Üye Ol 🎨</h2>
     <p class="modal-sub">Ücretsiz hesap oluştur</p>
-    <form onsubmit="event.preventDefault(); alert('Kayıt işleminiz başarıyla tamamlandı!'); closeModal('register');">
+    <form id="form-register">
       <div class="form-group">
         <label>Ad Soyad</label>
         <input type="text" placeholder="Adın Soyadın" required />
@@ -770,22 +771,54 @@
 </div>
 
 <script>
-  // Modal İşlemleri
+  // Modal Açma Kapama Fonksiyonları
   function openModal(id) {
-    document.getElementById('modal-' + id).classList.add('active');
-    document.body.style.overflow = 'hidden';
+    const modal = document.getElementById('modal-' + id);
+    if(modal) {
+      modal.style.display = 'flex';
+      // CSS geçiş efekti için tarayıcının render etmesini bekliyoruz
+      setTimeout(() => modal.classList.add('active'), 10);
+      document.body.style.overflow = 'hidden';
+    }
   }
+
   function closeModal(id) {
-    document.getElementById('modal-' + id).classList.remove('active');
-    document.body.style.overflow = '';
+    const modal = document.getElementById('modal-' + id);
+    if(modal) {
+      modal.classList.remove('active');
+      // Efekt bitince görünmez yapıyoruz
+      setTimeout(() => modal.style.display = 'none', 200);
+      document.body.style.overflow = '';
+    }
   }
+
   function closeModalOutside(e, id) {
-    if (e.target === document.getElementById('modal-' + id)) closeModal(id);
+    const targetModal = document.getElementById('modal-' + id);
+    if (e.target === targetModal) {
+      closeModal(id);
+    }
   }
+
   function switchModal(from, to) {
     closeModal(from);
-    setTimeout(() => openModal(to), 180);
+    // Eski modal kapandıktan hemen sonra yenisini açıyoruz
+    setTimeout(() => openModal(to), 250);
   }
+
+  // Form Gönderim İşlemleri
+  document.getElementById('form-login').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('Başarıyla giriş yapıldı! Mağazaya yönlendiriliyorsunuz.');
+    closeModal('login');
+    this.reset(); // Formu temizle
+  });
+
+  document.getElementById('form-register').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('Kayıt işleminiz başarıyla tamamlandı! Hobi Pazarı dünyasına hoş geldiniz.');
+    closeModal('register');
+    this.reset(); // Formu temizle
+  });
 
   // Favori Butonu Değişimi
   document.querySelectorAll('.fav-btn').forEach(btn => {
@@ -795,7 +828,7 @@
     });
   });
 
-  // CANLI ARAMA FONSİYONU (Yeni Eklendi)
+  // Canlı Arama Fonksiyonu
   const searchInput = document.querySelector('.search-bar input');
   searchInput.addEventListener('input', (e) => {
     const searchTerm = e.target.value.toLowerCase();
@@ -809,10 +842,11 @@
     });
   });
 
-  // Klavye ESC ile Modalları Kapatma
+  // Klavye ESC tuşu ile kapatma dinleyicisi
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-      ['login','register'].forEach(closeModal);
+      closeModal('login');
+      closeModal('register');
     }
   });
 </script>
