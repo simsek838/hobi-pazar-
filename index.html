@@ -525,7 +525,7 @@
   <ul class="sidebar-menu">
     <li class="sidebar-item"><a href="javascript:void(0)" onclick="showPage('home'); toggleSidebar(false);">🏠 Ana Sayfa</a></li>
     <li class="sidebar-item"><a href="javascript:void(0)" onclick="showPage('profile'); toggleSidebar(false);">👤 Profilim</a></li>
-    <li class="sidebar-item"><a href="javascript:void(0)" onclick="if(confirm('Eklediğiniz ilanları sıfırlamak istiyor musunuz?')){localStorage.removeItem('userListings'); location.reload();}">🧹 İlanları Sıfırla</a></li>
+    <li class="sidebar-item"><a href="javascript:void(0)" onclick="resetOnlineListings()">🧹 İlanları Sıfırla</a></li>
   </ul>
 </div>
 
@@ -769,346 +769,346 @@
 </div>
 
 <script>
-  // Varsayılan İlan Veritabanı
+  // JSONBIN - tüm cihazlarda çalışan online ilan deposu
+  const BIN_URL = "https://api.jsonbin.io/v3/b/685078a28960c979a5978fe4";
+  const BIN_KEY = "$2a$10$r0sYwJT0VWGfDnMxqV3nf.2JnJyvMakMPaVJjlpVrGCEy6wMDabMy";
+
   const defaultListings = [
-    { id: "def-1", emoji: "🧶", image: "", title: "El Örgüsü Yün Bere — Kışlık", price: "180", seller: "ayşe_hobi", location: "İstanbul", date: "2 saat önce", phone: "905551234567" },
-    { id: "def-2", emoji: "🎨", image: "", title: "Akrilik Tablo — Soyut Doğa, 40x50cm", price: "650", seller: "sanatci_mehmet", location: "Ankara", date: "5 saat önce", phone: "905557654321" },
-    { id: "def-3", emoji: "💍", image: "", title: "Gümüş Kaplama Doğal Taş Kolye", price: "290", seller: "taki_dunyasi", location: "İzmir", date: "1 gün önce", phone: "905321112233" },
-    { id: "def-4", emoji: "🪵", image: "", title: "El Yapımı Ahşap Çerçeve — Ceviz", price: "420", seller: "ahsap_atolye", location: "Bursa", date: "1 gün önce", phone: "905443332211" },
-    { id: "def-5", emoji: "📚", image: "", title: "Vintage Pul Koleksiyonu — 500+ Adet", price: "1.200", seller: "koleksiyoncu42", location: "Eskişehir", date: "2 gün önce", phone: "905334445566", sold: true },
-    { id: "def-6", emoji: "🌿", image: "", title: "El Yapımı Doğal Sabun Seti — 6'lı", price: "245", seller: "dogal_sabun", location: "Antalya", date: "3 saat önce", phone: "905559998877" }
+    { id:"def-1", emoji:"🧶", image:"", title:"El Örgüsü Yün Bere — Kışlık",       price:"180",   seller:"ayşe_hobi",      location:"İstanbul",  date:"2 saat önce", phone:"905551234567" },
+    { id:"def-2", emoji:"🎨", image:"", title:"Akrilik Tablo — Soyut Doğa 40x50",  price:"650",   seller:"sanatci_mehmet", location:"Ankara",    date:"5 saat önce", phone:"905557654321" },
+    { id:"def-3", emoji:"💍", image:"", title:"Gümüş Kaplama Doğal Taş Kolye",     price:"290",   seller:"taki_dunyasi",   location:"İzmir",     date:"1 gün önce",  phone:"905321112233" },
+    { id:"def-4", emoji:"🪵", image:"", title:"El Yapımı Ahşap Çerçeve — Ceviz",   price:"420",   seller:"ahsap_atolye",   location:"Bursa",     date:"1 gün önce",  phone:"905443332211" },
+    { id:"def-5", emoji:"📚", image:"", title:"Vintage Pul Koleksiyonu 500+ Adet",  price:"1.200", seller:"koleksiyoncu42", location:"Eskişehir", date:"2 gün önce",  phone:"905334445566", sold:true },
+    { id:"def-6", emoji:"🌿", image:"", title:"El Yapımı Doğal Sabun Seti 6lı",    price:"245",   seller:"dogal_sabun",    location:"Antalya",   date:"3 saat önce", phone:"905559998877" }
   ];
 
-  // Aktif Giriş Yapan Kullanıcı Takibi
-  let currentUser = JSON.parse(localStorage.getItem('activeUser')) || null;
+  // Online ilan çek
+  async function fetchOnlineListings() {
+    try {
+      const res  = await fetch(BIN_URL + "/latest", { headers:{ "X-Master-Key": BIN_KEY } });
+      const data = await res.json();
+      return Array.isArray(data.record && data.record.listings) ? data.record.listings : [];
+    } catch(e) { return []; }
+  }
 
-  // SPA Sayfa Değiştirici
+  // Online ilan ekle
+  async function pushOnlineListing(listing) {
+    try {
+      const existing = await fetchOnlineListings();
+      const updated  = [listing, ...existing];
+      const res = await fetch(BIN_URL, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "X-Master-Key": BIN_KEY },
+        body: JSON.stringify({ listings: updated })
+      });
+      return res.ok ? updated : null;
+    } catch(e) { return null; }
+  }
+
+  // Kullanıcı oturumu
+  let currentUser = null;
+  try { currentUser = JSON.parse(localStorage.getItem("activeUser")); } catch(e){}
+
+  // Sayfa değiştir
   function showPage(pageId) {
-    document.querySelectorAll('.app-page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-' + pageId).classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelectorAll(".app-page").forEach(function(p){ p.classList.remove("active"); });
+    var pg = document.getElementById("page-" + pageId);
+    if (pg) pg.classList.add("active");
+    window.scrollTo({ top:0, behavior:"smooth" });
   }
 
-  // Sol Menü Aç / Kapat
+  // Sidebar
   function toggleSidebar(status) {
-    document.getElementById('sidebar').classList.toggle('active', status);
-    document.getElementById('sidebar-overlay').classList.toggle('active', status);
+    document.getElementById("sidebar").classList.toggle("active", status);
+    document.getElementById("sidebar-overlay").classList.toggle("active", status);
   }
 
-  // Modalları Yöneten Fonksiyonlar
+  // Modal aç
   function openModal(id) {
-    document.getElementById('modal-' + id).classList.add('active');
-    document.body.style.overflow = 'hidden';
+    var m = document.getElementById("modal-" + id);
+    if (m) { m.classList.add("active"); document.body.style.overflow = "hidden"; }
   }
+
+  // Modal kapat
   function closeModal(id) {
-    document.getElementById('modal-' + id).classList.remove('active');
-    document.body.style.overflow = '';
+    var m = document.getElementById("modal-" + id);
+    if (m) { m.classList.remove("active"); document.body.style.overflow = ""; }
   }
+
+  // Dış tıkla kapat
   function closeModalOutside(e, id) {
-    if (e.target === document.getElementById('modal-' + id)) closeModal(id);
+    if (e.target === document.getElementById("modal-" + id)) closeModal(id);
   }
+
+  // Modal geçiş
   function switchModal(from, to) {
     closeModal(from);
-    setTimeout(() => openModal(to), 180);
+    setTimeout(function(){ openModal(to); }, 180);
   }
 
-  // Kullanıcı Arayüzü Güncelleme (Giriş / Çıkış Durumu)
+  // Header güncelle
   function updateAuthUI() {
-    const navAuth = document.getElementById('header-nav-auth');
-    const pName = document.getElementById('profile-name-display');
-    const pEmail = document.getElementById('profile-email-display');
-
+    var nav   = document.getElementById("header-nav-auth");
+    var pName = document.getElementById("profile-name-display");
+    var pMail = document.getElementById("profile-email-display");
+    if (!nav) return;
     if (currentUser) {
-      navAuth.innerHTML = `<button class="btn btn-outline" onclick="showPage('profile')">👤 ${currentUser.name}</button>`;
-      if(pName) pName.textContent = currentUser.name;
-      if(pEmail) pEmail.textContent = currentUser.email;
+      nav.innerHTML = '<button class="btn btn-outline" onclick="showPage('profile')">👤 ' + currentUser.name + '</button>';
+      if (pName) pName.textContent = currentUser.name;
+      if (pMail) pMail.textContent = currentUser.email;
     } else {
-      navAuth.innerHTML = `
-        <button class="btn btn-outline" onclick="openModal('login')">Giriş Yap</button>
-        <button class="btn btn-amber" onclick="openModal('register')">Üye Ol</button>
-      `;
-      if(pName) pName.textContent = "Misafir Kullanıcı";
-      if(pEmail) pEmail.textContent = "Giriş yapılmadı";
+      nav.innerHTML = '<button class="btn btn-outline" onclick="openModal('login')">Giriş Yap</button><button class="btn btn-amber" onclick="openModal('register')">Üye Ol</button>';
+      if (pName) pName.textContent = "Misafir Kullanıcı";
+      if (pMail) pMail.textContent = "Giriş yapılmadı";
     }
   }
 
-  // Üye Olma Motoru
+  // Üye ol
   function registerUser(e) {
     e.preventDefault();
-    const name = document.getElementById('reg-name').value;
-    const email = document.getElementById('reg-email').value;
-    const password = document.getElementById('reg-pass').value;
-
-    const userObj = { name, email, password };
-    localStorage.setItem('activeUser', JSON.stringify(userObj));
-    currentUser = userObj;
-
+    var name  = document.getElementById("reg-name").value.trim();
+    var email = document.getElementById("reg-email").value.trim();
+    var pass  = document.getElementById("reg-pass").value;
+    if (!name || !email || !pass) { alert("Lütfen tüm alanları doldurun."); return; }
+    var user = { name: name, email: email, password: pass };
+    try { localStorage.setItem("activeUser", JSON.stringify(user)); } catch(er){}
+    currentUser = user;
     updateAuthUI();
-    closeModal('register');
-    alert(`🎉 Aramıza hoş geldin ${name}! Kayıt başarıyla tamamlandı.`);
+    closeModal("register");
+    alert("🎉 Aramıza hoş geldin " + name + "!");
   }
 
-  // Giriş Yapma Motoru
+  // Giriş yap
   function loginUser(e) {
     e.preventDefault();
-    const email = document.getElementById('login-email').value;
-    const nameFromEmail = email.split('@')[0]; 
-
-    const userObj = { name: nameFromEmail, email: email };
-    localStorage.setItem('activeUser', JSON.stringify(userObj));
-    currentUser = userObj;
-
+    var email = document.getElementById("login-email").value.trim();
+    var pass  = document.getElementById("login-pass").value;
+    if (!email || !pass) { alert("E-posta ve şifre boş bırakılamaz."); return; }
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem("activeUser")); } catch(er){}
+    if (saved && saved.email === email && saved.password === pass) {
+      currentUser = saved;
+    } else if (saved && saved.email === email) {
+      alert("Şifre hatalı! Kayıt olurken girdiğiniz şifreyi deneyin.");
+      return;
+    } else {
+      // Yeni cihazda giriş — kullanıcı adını e-postadan al
+      var name = email.split("@")[0];
+      currentUser = { name: name, email: email, password: pass };
+      try { localStorage.setItem("activeUser", JSON.stringify(currentUser)); } catch(er){}
+    }
     updateAuthUI();
-    closeModal('login');
-    alert(`👋 Tekrar hoş geldin, ${nameFromEmail}!`);
+    closeModal("login");
+    alert("👋 Hoş geldin, " + currentUser.name + "!");
   }
 
-  // Çıkış Yapma Motoru
+  // Çıkış
   function logoutUser() {
-    localStorage.removeItem('activeUser');
+    try { localStorage.removeItem("activeUser"); } catch(e){}
     currentUser = null;
     updateAuthUI();
-    showPage('home');
-    alert("Oturum güvenli bir şekilde kapatıldı.");
+    showPage("home");
+    alert("Oturum kapatıldı.");
   }
 
-  // İlan Verme Butonu Kontrolü (Giriş Yapılmadıysa Kayda Zorlar)
+  // İlan ver butonu
   function handleCreateListingClick() {
     if (!currentUser) {
-      alert("İlan verebilmek için lütfen önce üye olun veya giriş yapın!");
-      openModal('register');
+      alert("İlan verebilmek için önce üye olun veya giriş yapın!");
+      openModal("register");
     } else {
-      openModal('create-listing');
+      openModal("create-listing");
     }
   }
 
-  // ANA SAYFA VİTRİN ÇİZİCİ
-  function renderVitrin() {
-    const grid = document.getElementById('main-products-grid');
-    if (!grid) return;
-    grid.innerHTML = "";
-
-    const savedListings = JSON.parse(localStorage.getItem('userListings')) || [];
-    const combinedListings = [...savedListings, ...defaultListings];
-
-    combinedListings.forEach(product => {
-      const card = createProductCard(product, combinedListings);
-      grid.appendChild(card);
-    });
-  }
-
-  // AYRI ARAMA SAYFASINI TETİKLEYEN MOTOR
-  function triggerSearchPage() {
-    const query = document.getElementById('search-input').value.trim();
-    if(query === "") {
-      showPage('home');
-      return;
-    }
-
-    const grid = document.getElementById('search-page-products-grid');
-    const title = document.getElementById('search-page-title');
-    const countDisplay = document.getElementById('search-count-display');
-    
-    if (!grid) return;
-    grid.innerHTML = "";
-
-    title.textContent = `"${query}" İçin Arama Sonuçları`;
-
-    const savedListings = JSON.parse(localStorage.getItem('userListings')) || [];
-    const combinedListings = [...savedListings, ...defaultListings];
-
-    // Kelime filtreleme
-    const filtered = combinedListings.filter(item => {
-      return item.title.toLowerCase().includes(query.toLowerCase()) || 
-             item.seller.toLowerCase().includes(query.toLowerCase()) ||
-             item.location.toLowerCase().includes(query.toLowerCase());
-    });
-
-    countDisplay.textContent = `${filtered.length} ilan bulundu`;
-
-    if(filtered.length === 0) {
-      grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; padding: 40px; color:var(--gray);">Aradığınız kriterlere uygun ilan bulunamadı.</p>`;
-    } else {
-      filtered.forEach(product => {
-        const card = createProductCard(product, combinedListings);
-        grid.appendChild(card);
-      });
-    }
-
-    showPage('search-results');
-  }
-
-  // KATEGORİ SEÇİLDİĞİNDE DE FARKLI ARAMA SAYFASINI AÇMA
-  function filterByCategory(emoji) {
-    const grid = document.getElementById('search-page-products-grid');
-    const title = document.getElementById('search-page-title');
-    const countDisplay = document.getElementById('search-count-display');
-    
-    if (!grid) return;
-    grid.innerHTML = "";
-
-    title.textContent = `Kategori Seçimi Sonuçları`;
-
-    const savedListings = JSON.parse(localStorage.getItem('userListings')) || [];
-    const combinedListings = [...savedListings, ...defaultListings];
-
-    const filtered = combinedListings.filter(item => item.emoji === emoji);
-    countDisplay.textContent = `${filtered.length} ilan bulundu`;
-
-    if(filtered.length === 0) {
-      grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; padding: 40px; color:var(--gray);">Bu kategoride henüz ilan bulunmuyor.</p>`;
-    } else {
-      filtered.forEach(product => {
-        const card = createProductCard(product, combinedListings);
-        grid.appendChild(card);
-      });
-    }
-
-    showPage('search-results');
-  }
-
-  // ORTAK KART ÜRETİCİ FONKSİYON
-  function createProductCard(product, combinedListings) {
-    const card = document.createElement('div');
+  // Ürün kartı oluştur
+  function createProductCard(product, allListings) {
+    var card = document.createElement("div");
     card.className = "product-card";
-    
-    card.addEventListener('click', () => {
-      openListingDetails(product.id, combinedListings);
+    card.addEventListener("click", function(){ openListingDetails(product.id, allListings); });
+    var img   = product.image ? '<img src="' + product.image + '" alt="Ürün">' : product.emoji;
+    var badge = product.sold  ? '<span class="badge-sold">Satıldı</span>' : '<span class="badge-new">Yeni</span>';
+    card.innerHTML =
+      '<div class="product-img">' + img + '</div>' +
+      badge +
+      '<button class="fav-btn">🤍</button>' +
+      '<div class="product-info">' +
+        '<div class="product-title">' + product.title + '</div>' +
+        '<div class="product-meta">' +
+          '<div class="product-price">₺' + product.price + '</div>' +
+          '<div class="product-seller">Satıcı: <span>' + product.seller + '</span></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="product-footer">' +
+        '<span class="product-location">' + product.location + '</span>' +
+        '<span class="product-date">' + product.date + '</span>' +
+      '</div>';
+    card.querySelector(".fav-btn").addEventListener("click", function(ev){
+      ev.stopPropagation();
+      this.textContent = this.textContent === "🤍" ? "❤️" : "🤍";
     });
-
-    let imgHTML = product.image 
-      ? `<img src="${product.image}" alt="Ürün Fotoğrafı">` 
-      : product.emoji;
-
-    let badgeHTML = product.sold 
-      ? `<span class="badge-sold">Satıldı</span>` 
-      : `<span class="badge-new">Yeni</span>`;
-
-    card.innerHTML = `
-      <div class="product-img">${imgHTML}</div>
-      ${badgeHTML}
-      <button class="fav-btn">🤍</button>
-      <div class="product-info">
-        <div class="product-title">${product.title}</div>
-        <div class="product-meta">
-          <div class="product-price">₺${product.price}</div>
-          <div class="product-seller">Satıcı: <span>${product.seller}</span></div>
-        </div>
-      </div>
-      <div class="product-footer">
-        <span class="product-location">${product.location}</span>
-        <span class="product-date">${product.date}</span>
-      </div>
-    `;
-
-    const favBtn = card.querySelector('.fav-btn');
-    favBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      favBtn.textContent = favBtn.textContent === '🤍' ? '❤️' : '🤍';
-    });
-
     return card;
   }
 
-  // Arama Temizleme
+  // Vitrin yükle
+  async function renderVitrin() {
+    var grid = document.getElementById("main-products-grid");
+    if (!grid) return;
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray);">⏳ İlanlar yükleniyor…</div>';
+    var online   = await fetchOnlineListings();
+    var combined = online.concat(defaultListings);
+    grid.innerHTML = "";
+    combined.forEach(function(p){ grid.appendChild(createProductCard(p, combined)); });
+  }
+
+  // Arama
+  async function triggerSearchPage() {
+    var inp = document.getElementById("search-input");
+    var q   = inp ? inp.value.trim() : "";
+    if (!q) { showPage("home"); return; }
+    var grid  = document.getElementById("search-page-products-grid");
+    var title = document.getElementById("search-page-title");
+    var count = document.getElementById("search-count-display");
+    if (!grid) return;
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray);">⏳ Aranıyor…</div>';
+    showPage("search-results");
+    var online   = await fetchOnlineListings();
+    var combined = online.concat(defaultListings);
+    var ql = q.toLowerCase();
+    var filtered = combined.filter(function(i){
+      return i.title.toLowerCase().includes(ql) || i.seller.toLowerCase().includes(ql) || i.location.toLowerCase().includes(ql);
+    });
+    if (title) title.textContent = '"' + q + '" için sonuçlar';
+    if (count) count.textContent = filtered.length + " ilan bulundu";
+    grid.innerHTML = "";
+    if (filtered.length === 0) {
+      grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray);">Sonuç bulunamadı.</p>';
+    } else {
+      filtered.forEach(function(p){ grid.appendChild(createProductCard(p, combined)); });
+    }
+  }
+
+  // Kategori filtrele
+  async function filterByCategory(emoji) {
+    var grid  = document.getElementById("search-page-products-grid");
+    var title = document.getElementById("search-page-title");
+    var count = document.getElementById("search-count-display");
+    if (!grid) return;
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray);">⏳ Yükleniyor…</div>';
+    showPage("search-results");
+    var online   = await fetchOnlineListings();
+    var combined = online.concat(defaultListings);
+    var filtered = combined.filter(function(i){ return i.emoji === emoji; });
+    if (title) title.textContent = "Kategori Sonuçları";
+    if (count) count.textContent = filtered.length + " ilan bulundu";
+    grid.innerHTML = "";
+    if (filtered.length === 0) {
+      grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray);">Bu kategoride ilan yok.</p>';
+    } else {
+      filtered.forEach(function(p){ grid.appendChild(createProductCard(p, combined)); });
+    }
+  }
+
+  // Arama sıfırla
   function resetSearch() {
-    document.getElementById('search-input').value = "";
-    showPage('home');
+    var inp = document.getElementById("search-input");
+    if (inp) inp.value = "";
+    showPage("home");
     renderVitrin();
   }
 
-  // Detay Sayfası Gösterimi
+  // İlan detay
   function openListingDetails(id, sourceList) {
-    const item = sourceList.find(x => x.id === id);
+    var item = sourceList.find(function(x){ return x.id === id; });
     if (!item) return;
-
-    const target = document.getElementById('details-render-target');
-    
-    let cleanPhone = item.phone.replace(/\D/g, "");
-    if(cleanPhone.startsWith("0")) cleanPhone = "90" + cleanPhone.substring(1);
-
-    let whatsappText = encodeURIComponent(`Merhaba, "${item.title}" ilanınız için Hobi Pazarı'ndan ulaşıyorum. Ürün hâlâ satılık mı?`);
-    let whatsappURL = `https://wa.me/${cleanPhone}?text=${whatsappText}`;
-
-    let imgHTML = item.image 
-      ? `<img src="${item.image}" alt="Ürün Detay">` 
-      : item.emoji;
-
-    target.innerHTML = `
-      <div class="details-main-img">${imgHTML}</div>
-      <div class="details-content-box">
-        <div>
-          <h1 class="details-headline">${item.title}</h1>
-          <div class="details-price-tag">₺${item.price}</div>
-          <div class="details-row"><strong>📍 Konum:</strong> ${item.location}</div>
-          <div class="details-row"><strong>👤 Satıcı:</strong> @${item.seller}</div>
-          <div class="details-row"><strong>🕐 İlan Tarihi:</strong> ${item.date}</div>
-        </div>
-        <a href="${whatsappURL}" target="_blank" class="modal-btn" style="margin-top:25px; text-align:center; text-decoration:none; display:block; background:#25D366; color:#fff;">
-          🟢 WhatsApp'tan İletişime Geç
-        </a>
-      </div>
-    `;
-    showPage('details');
+    var target = document.getElementById("details-render-target");
+    if (!target) return;
+    var phone = item.phone.replace(/[^0-9]/g, "");
+    if (phone.charAt(0) === "0") phone = "90" + phone.substring(1);
+    var waText = encodeURIComponent('Merhaba, "' + item.title + '" ilanınız için Hobi Pazarı'ndan ulaşıyorum. Ürün hâlâ satılık mı?');
+    var img = item.image ? '<img src="' + item.image + '" alt="Ürün Detay">' : item.emoji;
+    target.innerHTML =
+      '<div class="details-main-img">' + img + '</div>' +
+      '<div class="details-content-box">' +
+        '<div>' +
+          '<h1 class="details-headline">' + item.title + '</h1>' +
+          '<div class="details-price-tag">₺' + item.price + '</div>' +
+          '<div class="details-row"><strong>📍 Konum:</strong> ' + item.location + '</div>' +
+          '<div class="details-row"><strong>👤 Satıcı:</strong> @' + item.seller + '</div>' +
+          '<div class="details-row"><strong>🕐 Tarih:</strong> ' + item.date + '</div>' +
+        '</div>' +
+        '<a href="https://wa.me/' + phone + '?text=' + waText + '" target="_blank" class="modal-btn" style="margin-top:25px;text-align:center;text-decoration:none;display:block;background:#25D366;color:#fff;">🟢 WhatsApp'tan İletişime Geç</a>' +
+      '</div>';
+    showPage("details");
   }
 
-  // Yeni İlan Kaydetme
-  function saveCustomListing(e) {
+  // İlan kaydet
+  async function saveCustomListing(e) {
     e.preventDefault();
+    var title    = document.getElementById("form-title").value.trim();
+    var category = document.getElementById("form-category").value;
+    var price    = document.getElementById("form-price").value;
+    var location = document.getElementById("form-location").value.trim();
+    var phone    = document.getElementById("form-phone").value.trim();
+    var imgFile  = document.getElementById("form-image").files[0];
 
-    const title = document.getElementById('form-title').value;
-    const category = document.getElementById('form-category').value;
-    const price = document.getElementById('form-price').value;
-    const location = document.getElementById('form-location').value;
-    const phone = document.getElementById('form-phone').value;
-    const imageFile = document.getElementById('form-image').files[0];
-
-    const proceedSaving = (imageDataBase64 = "") => {
-      const newListing = {
-        id: "user-" + Date.now(),
-        emoji: category,
-        image: imageDataBase64,
-        title: title,
-        price: Number(price).toLocaleString('tr-TR'),
-        seller: currentUser ? currentUser.name : "anonim_uyemiz",
+    var doSave = async function(imgBase64) {
+      imgBase64 = imgBase64 || "";
+      var listing = {
+        id:       "u-" + Date.now(),
+        emoji:    category,
+        image:    imgBase64,
+        title:    title,
+        price:    Number(price).toLocaleString("tr-TR"),
+        seller:   currentUser ? currentUser.name : "misafir",
         location: location,
-        date: "Az önce",
-        phone: phone
+        date:     "Az önce",
+        phone:    phone
       };
-
-      let currentSavedListings = JSON.parse(localStorage.getItem('userListings')) || [];
-      currentSavedListings.unshift(newListing);
-      localStorage.setItem('userListings', JSON.stringify(currentSavedListings));
-
-      showPage('home');
-      renderVitrin();
-      closeModal('create-listing');
-      document.getElementById('new-listing-form').reset();
-      alert("🚀 Harika! Fotoğraflı yeni ilanınız başarıyla vitrine eklendi.");
+      var btn = document.querySelector("#new-listing-form button[type=submit]");
+      if (btn) { btn.textContent = "⏳ Kaydediliyor…"; btn.disabled = true; }
+      var result = await pushOnlineListing(listing);
+      if (btn) { btn.textContent = "İlanı Yayınla 🚀"; btn.disabled = false; }
+      closeModal("create-listing");
+      document.getElementById("new-listing-form").reset();
+      if (result) {
+        alert("🚀 İlanınız yayınlandı! Her cihazdan görünür.");
+        showPage("home");
+        renderVitrin();
+      } else {
+        alert("⚠️ Kaydedilemedi. İnternet bağlantınızı kontrol edin.");
+      }
     };
 
-    if (imageFile) {
-      const reader = new FileReader();
-      reader.onloadend = function () {
-        proceedSaving(reader.result);
-      };
-      reader.readAsDataURL(imageFile);
+    if (imgFile) {
+      var reader = new FileReader();
+      reader.onloadend = function(){ doSave(reader.result); };
+      reader.readAsDataURL(imgFile);
     } else {
-      proceedSaving("");
+      doSave("");
     }
   }
 
-  // Sayfa İlk Yüklendiğinde Motorları Çalıştır
-  window.onload = function() {
+  // Online ilanları sıfırla
+  async function resetOnlineListings() {
+    if (!confirm("Tüm kullanıcı ilanlarını silmek istiyor musunuz?")) return;
+    await fetch(BIN_URL, {
+      method: "PUT",
+      headers: { "Content-Type":"application/json", "X-Master-Key": BIN_KEY },
+      body: JSON.stringify({ listings: [] })
+    });
+    renderVitrin();
+  }
+
+  // Sayfa yüklenince
+  window.addEventListener("DOMContentLoaded", function(){
     updateAuthUI();
     renderVitrin();
-  };
+  });
 
-  // ESC Tuşu Dinleyicisi
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      ['login','register','create-listing'].forEach(closeModal);
-    }
+  // ESC ile kapat
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape") ["login","register","create-listing"].forEach(closeModal);
   });
 </script>
 </body>
